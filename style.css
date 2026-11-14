@@ -190,3 +190,10 @@ footer { margin-top: 64px; text-align: center; color: var(--muted); font-size: 0
 }
 .sub-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 12px 0 0; }
 .sub-controls .btn { font-size: 0.88rem; }
+
+/* ---- 上の名前のところを押すと、そのページを読み直す（21日目） ---- */
+.hero-link { display: block; color: inherit; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.hero-link h1 { transition: color 0.2s; }
+.hero-link:hover h1, .hero-link:focus-visible h1 { color: #fff8e6; }
+.hero-link:focus-visible { outline: 1px dashed var(--gold); outline-offset: 8px; border-radius: 8px; }
+.hero-link:active { opacity: 0.8; }
