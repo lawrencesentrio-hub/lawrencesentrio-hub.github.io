@@ -1,0 +1,192 @@
+/* 色の決まり（11日目の見出し画像「夜の紺」と同じ色） */
+:root {
+  --bg-top: #1e2a42;
+  --bg-bottom: #121a2c;
+  --text: #f6f3ec;
+  --muted: #aab4c8;
+  --gold: #c4aa78;
+  --line: #2f3c58;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* 上の夜空とつながるように、最初の部分は丘と同じ色にしてから、下に向かって暗くする */
+  background: linear-gradient(#1a2440 0, #1a2440 700px, var(--bg-bottom) 100%);
+  color: var(--text);
+  font-family: "Yu Gothic UI", "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  line-height: 1.9;
+}
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 64px 20px 48px;
+}
+/* ---- いちばん上の「夜空」の部分 ---- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 96px 20px 140px;
+  /* 右上に、月の光のようなぼんやりした明かり */
+  background:
+    radial-gradient(circle at 78% 22%, rgba(240, 214, 150, 0.22) 0, rgba(240, 214, 150, 0.07) 100px, transparent 230px),
+    radial-gradient(ellipse at 50% 120%, #2b3c62 0, transparent 60%),
+    linear-gradient(#0f1626, #1e2a42);
+}
+/* 小さな星（点をいくつも散らす） */
+.hero::before, .hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+}
+.hero::before {
+  background-image:
+    radial-gradient(1.4px 1.4px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 90px 80px, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 160px 20px, #f3e6c4, transparent),
+    radial-gradient(1px 1px at 230px 120px, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 300px 60px, #fff, transparent),
+    radial-gradient(1px 1px at 50px 160px, #f3e6c4, transparent),
+    radial-gradient(1.2px 1.2px at 260px 190px, #fff, transparent);
+  background-size: 340px 220px;
+  opacity: 0.75;
+}
+.hero::after {
+  background-image:
+    radial-gradient(1px 1px at 60px 60px, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 190px 140px, #fff, transparent),
+    radial-gradient(1px 1px at 400px 30px, #f3e6c4, transparent),
+    radial-gradient(1.5px 1.5px at 330px 170px, #fff, transparent);
+  background-size: 470px 260px;
+  opacity: 0.5;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.25; } to { opacity: 0.7; } }
+@media (prefers-reduced-motion: reduce) { .hero::after { animation: none; } }
+/* 下のなだらかな丘（夜の山なみ） */
+.hills {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  width: 100%;
+  height: 120px;
+  display: block;
+}
+/* 三日月（丸の内側に影をつけて、細い月の形にする） */
+.moon {
+  position: absolute;
+  top: calc(22% - 24px);
+  left: calc(78% - 24px);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: inset -11px 7px 0 0 #f1e2b8;
+  filter: drop-shadow(0 0 10px rgba(241, 226, 184, 0.45));
+  transform: rotate(-20deg);
+}
+@media (max-width: 480px) {
+  .moon { top: 26px; left: calc(88% - 18px); width: 36px; height: 36px; box-shadow: inset -8px 5px 0 0 #f1e2b8; }
+  .hero { padding: 84px 20px 120px; }
+}
+.hero-inner { position: relative; z-index: 1; }
+h1 { font-size: 2.4rem; margin: 0; letter-spacing: 0.1em; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); }
+.en { color: var(--gold); letter-spacing: 0.2em; margin: 6px 0 22px; }
+.lead { color: #d6dbe6; margin: 0; }
+.rule { width: 64px; height: 2px; background: var(--gold); border: 0; margin: 28px auto 0; }
+main { padding-top: 24px; }
+h2 {
+  font-size: 1.15rem;
+  color: var(--gold);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin: 44px 0 16px;
+  letter-spacing: 0.06em;
+}
+ul { padding-left: 1.2em; margin: 0; }
+li { margin-bottom: 10px; }
+.note { color: var(--muted); font-size: 0.92rem; }
+a { color: var(--text); text-decoration-color: var(--gold); text-underline-offset: 4px; }
+a:hover { color: var(--gold); }
+.links { list-style: none; padding: 0; display: flex; gap: 12px; flex-wrap: wrap; }
+.links a {
+  display: inline-block;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 6px 20px;
+  text-decoration: none;
+}
+footer { margin-top: 64px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+/* ---- 連載の目次ページ（17日目） ---- */
+.hero.small { padding: 64px 20px 110px; }
+.hero.small h1 { font-size: 1.9rem; }
+.back { display: inline-block; margin-bottom: 8px; color: var(--muted); font-size: 0.9rem; text-decoration: none; }
+.back:hover { color: var(--gold); }
+.toc-nav { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 8px 0 0; }
+.toc-nav a { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: 0.88rem; text-decoration: none; color: var(--muted); }
+.toc-nav a:hover { border-color: var(--gold); color: var(--gold); }
+.series { scroll-margin-top: 16px; }
+.series .meta { color: var(--muted); font-size: 0.9rem; margin: -6px 0 12px; }
+.episodes { list-style: none; padding: 0; margin: 0; counter-reset: ep; }
+.episodes li { display: flex; gap: 14px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.episodes .date { flex: 0 0 auto; color: var(--muted); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.episodes a { text-decoration: none; }
+.episodes a:hover { text-decoration: underline; }
+.more { margin-top: 10px; font-size: 0.9rem; }
+@media (max-width: 480px) {
+  .episodes li { flex-direction: column; gap: 0; }
+}
+
+/* ---- お題ページ（18日目） ---- */
+.today-label { text-align: center; color: var(--muted); margin: 8px 0 18px; }
+.card {
+  position: relative;
+  background: rgba(44, 58, 88, 0.55);
+  border: 1px solid var(--gold);
+  border-radius: 18px;
+  padding: 28px 24px 24px;
+  margin: 0 0 18px;
+}
+.card.done { border-color: #7fb39a; }
+.card .week { color: var(--gold); font-size: 0.9rem; letter-spacing: 0.08em; margin: 0; }
+.card .day { font-size: 2rem; font-weight: bold; margin: 2px 0 0; }
+.card .date { color: var(--muted); font-size: 0.9rem; margin: 0 0 14px; }
+.card .task { font-size: 1.15rem; line-height: 1.8; margin: 0 0 14px; }
+.card .result { color: var(--muted); font-size: 0.92rem; margin: 0; }
+.card .result b { color: var(--gold); font-weight: normal; }
+.stamp {
+  position: absolute; top: 18px; right: 18px;
+  border: 2px solid #7fb39a; color: #9fd1b8; border-radius: 999px;
+  padding: 2px 14px; font-size: 0.9rem; transform: rotate(6deg);
+}
+.controls { display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.btn {
+  font: inherit; color: var(--text); background: transparent; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; padding: 8px 18px;
+}
+.btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn.primary { border-color: var(--gold); background: rgba(196, 170, 120, 0.12); padding: 10px 26px; }
+.btn.primary.is-done { border-color: #7fb39a; background: rgba(127, 179, 154, 0.15); color: #bfe3d1; }
+.progress { color: var(--muted); font-size: 0.92rem; text-align: center; margin: 22px 0 10px; }
+.bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--gold); width: 0; transition: width 0.4s; }
+.days { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-top: 16px; }
+.days button {
+  font: inherit; font-size: 0.85rem; aspect-ratio: 1; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted);
+}
+.days button.done { background: rgba(127, 179, 154, 0.25); border-color: #7fb39a; color: #dff1e8; }
+.days button.today { outline: 2px solid var(--gold); outline-offset: 1px; color: var(--text); }
+.days button.current { background: rgba(196, 170, 120, 0.25); color: var(--text); }
+.days button.later { opacity: 0.45; }
+.hint { color: var(--muted); font-size: 0.82rem; margin-top: 14px; }
+@media (max-width: 480px) {
+  .days { grid-template-columns: repeat(6, 1fr); }
+  .card { padding: 24px 18px 20px; }
+  .controls .btn { padding: 8px 14px; }
+}
+.sub-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 12px 0 0; }
+.sub-controls .btn { font-size: 0.88rem; }

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>30日チャレンジのお題｜ローレンス</title>
+  <meta name="description" content="54歳、Claude Code で30日チャレンジ。毎日のお題を、日ごとに切り替えて表示します。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero small">
+    <div class="moon" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <h1>30日チャレンジのお題</h1>
+      <p class="en">30-Day Challenge</p>
+      <p class="lead">54歳、Claude Code で30日チャレンジ</p>
+    </div>
+    <svg class="hills" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,70 C200,30 360,95 560,62 C760,30 900,88 1100,58 C1260,36 1360,60 1440,48 L1440,120 L0,120 Z" fill="#223055" opacity="0.9"/>
+      <path d="M0,95 C180,72 380,110 620,88 C840,68 1040,108 1240,86 C1340,76 1400,84 1440,80 L1440,120 L0,120 Z" fill="#1a2440"/>
+    </svg>
+  </header>
+
+  <main>
+    <a class="back" href="index.html">← 自己紹介にもどる</a>
+
+    <p class="today-label" id="todayLabel"></p>
+
+    <article class="card" id="card" aria-live="polite">
+      <span class="stamp" id="stamp" hidden>やった</span>
+      <p class="week" id="week"></p>
+      <p class="day" id="day"></p>
+      <p class="date" id="date"></p>
+      <p class="task" id="task"></p>
+      <p class="result" id="result"></p>
+    </article>
+
+    <div class="controls">
+      <button class="btn" id="prev" type="button">← 前の日</button>
+      <button class="btn primary" id="doneBtn" type="button">やった</button>
+      <button class="btn" id="next" type="button">次の日 →</button>
+    </div>
+    <p class="sub-controls">
+      <button class="btn" id="toNext" type="button">次のお題へ</button>
+      <button class="btn" id="bulkBtn" type="button"></button>
+    </p>
+
+    <p class="progress" id="progress"></p>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+
+    <h2>30日の一覧</h2>
+    <div class="days" id="days"></div>
+    <p class="hint">「やった」の印は、このブラウザの中だけに覚えておきます。ほかのスマホやパソコンには伝わりません。</p>
+
+    <footer>
+      <p>2026年11月　Claude Code と一緒に作りました</p>
+    </footer>
+  </main>
+
+  <script>
+    // ---- 30日分のお題（第4週は、決まったらここに足す） ----
+    const WEEKS = {
+      1: "第1週　文章とファイルを扱う",
+      2: "第2週　データと自動化",
+      3: "第3週　自分のページを作って公開する",
+      4: "第4週",
+      5: "最後の2日",
+    };
+    const DAYS = [
+      ["作業用フォルダ「ai-challenge」を作り、Claude Code を起動。「このフォルダの説明書を作って」と頼む", "作業フォルダと説明書（README.md）"],
+      ["note のエッセイ1本をテキストファイルで置き、要約と「読者が引っかかりそうな箇所」を別ファイルに書かせる", "要約と指摘のファイル"],
+      ["エッセイ10本をまとめて読ませ、各回のタイトル案を三つずつ一覧にする", "タイトル案の一覧表"],
+      ["原稿の誤字脱字と表記ゆれを直させ、「どこをどう直したか」の差分を見る", "修正版の原稿と修正箇所の一覧"],
+      ["エッセイ1本から X の投稿文を五つ作らせ、140字以内かどうかを「数えるプログラム」で確かめさせる", "投稿文と文字数チェックの結果"],
+      ["「CLAUDE.md」という設定ファイルに自分の文体ルール（三則など）を書き、そのルールで推敲させる", "自分専用のルールファイル"],
+      ["その日の作業を振り返り、note の下書きとして書かせる", "note 記事の下書き"],
+      ["note 記事のタイトル、公開日、スキ数を表（CSV）に書き出し、「よく読まれた記事の共通点」を分析させる", "集計表と分析メモ"],
+      ["8日目の表から、スキ数の推移をグラフ画像にする", "グラフの画像"],
+      ["写真フォルダのコピーを作り、ファイル名を「撮影日_連番」に一括で変える", "整理された写真フォルダ"],
+      ["写真をまとめて note の見出し画像の大きさに縮小・切り抜きする", "見出し用の画像一式"],
+      ["Word や PDF の原稿を、まとめてテキストに変換し、文字数を一覧にする", "変換したテキストと文字数表"],
+      ["「今日やったこと」を一行入力すると、日付つきで記録ファイルに追記される、小さなプログラムを作らせる", "自分専用の記録ツール"],
+      ["この週に作ったプログラムの説明書を書かせ、「どういう仕組みで動いているか」を初心者向けに説明させる", "プログラムの説明書"],
+      ["自己紹介のページを1枚だけ作らせて、ブラウザで開いてみる", "自己紹介ページ"],
+      ["色・文字・余白を変えて、スマホでも読みやすくする。「もっと静かな雰囲気に」のように、言葉で指示する", "デザインを整えたページ"],
+      ["エッセイ連載の目次ページを作り、各回の note 記事へリンクを張る", "連載の目次ページ"],
+      ["この30日チャレンジのお題を、日ごとに切り替えて表示するページを作る", "お題ページ（第4週の土台になる）"],
+      ["Git（ファイルを変えた記録を残す仕組み）を、Claude Code に説明してもらいながら使い始める", "変えた記録が残る作業フォルダ"],
+      ["GitHub にファイルを上げて、GitHub Pages（無料でページを公開できる仕組み）で公開する", "公開されたページの URL"],
+      ["公開したページをスマホで開き、気になるところを三つ直して、もう一度公開する", "直したあとの公開ページ"],
+    ];
+    const TOTAL = 30;
+    const KEY = "challenge30-done";
+
+    // ---- 「やった」の印を覚えておく（日付を一緒に残す。使えないブラウザでも、ページは動くようにする） ----
+    // 形：{ "1": "2026-11-13", "2": "2026-11-14", ... }
+    let done = {};
+    try { done = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { done = {}; }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} }
+    function todayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    function jpDate(s) {
+      if (typeof s !== "string") return "";
+      const [y, m, d] = s.split("-").map(Number);
+      return `${m}月${d}日`;
+    }
+
+    // ---- 次のお題＝まだ「やった」がついていない、いちばん若い日 ----
+    const READY = DAYS.length;                 // お題が決まっている日数
+    function nextDay() {
+      for (let i = 1; i <= READY; i++) if (!done[i]) return i;
+      return Math.min(READY + 1, TOTAL);        // 決まっているお題を全部やったとき
+    }
+    const clampDay = n => Math.min(TOTAL, Math.max(1, n));
+    let current = nextDay();
+
+    const $ = id => document.getElementById(id);
+
+    function render() {
+      const n = current;
+      const nx = nextDay();
+      const item = DAYS[n - 1];
+      const week = n <= 28 ? Math.ceil(n / 7) : 5;
+      $("week").textContent = WEEKS[week];
+      $("day").textContent = n + "日目";
+      $("task").textContent = item ? item[0] : "このお題は、これから決まります。";
+      $("result").innerHTML = item ? "できあがるもの：<b></b>" : "";
+      if (item) $("result").querySelector("b").textContent = item[1];
+
+      const isDone = !!done[n];
+      $("date").textContent = isDone ? (jpDate(done[n]) ? jpDate(done[n]) + "にやった" : "やった") : "";
+      $("date").hidden = !isDone;
+      $("card").classList.toggle("done", isDone);
+      $("stamp").hidden = !isDone;
+      $("doneBtn").textContent = isDone ? "✓ やった（取り消す）" : "やった";
+      $("doneBtn").classList.toggle("is-done", isDone);
+      $("doneBtn").disabled = !item;
+      $("prev").disabled = n <= 1;
+      $("next").disabled = n >= TOTAL;
+      $("toNext").hidden = n === nx;
+
+      // まとめて「やった」：今見ている日より前に、まだやっていない日があるときだけ出す
+      let missing = 0;
+      for (let i = 1; i <= Math.min(n, READY); i++) if (!done[i]) missing++;
+      $("bulkBtn").hidden = !item || n === 1 || missing === 0 || (missing === 1 && !done[n] && n === nx);
+      $("bulkBtn").textContent = `1〜${n}日目を、まとめて「やった」にする`;
+
+      const doneCount = Object.keys(done).filter(k => done[k]).length;
+      if (doneCount === 0) $("todayLabel").textContent = "まずは 1日目 から。";
+      else if (nx > READY) $("todayLabel").textContent = "用意されているお題は、全部やりました。";
+      else $("todayLabel").textContent = `次は ${nx}日目 です`;
+
+      $("progress").textContent = `やった日：${doneCount} / ${TOTAL}日`;
+      $("bar").style.width = (doneCount / TOTAL * 100) + "%";
+
+      const box = $("days");
+      box.innerHTML = "";
+      for (let i = 1; i <= TOTAL; i++) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = i;
+        b.setAttribute("aria-label", `${i}日目${done[i] ? "（やった）" : ""}`);
+        if (done[i]) b.classList.add("done");
+        if (i === nx) b.classList.add("today");
+        if (i === n) b.classList.add("current");
+        if (!DAYS[i - 1]) b.classList.add("later");
+        b.addEventListener("click", () => { current = i; render(); });
+        box.appendChild(b);
+      }
+    }
+
+    $("prev").addEventListener("click", () => { current = clampDay(current - 1); render(); });
+    $("next").addEventListener("click", () => { current = clampDay(current + 1); render(); });
+    $("toNext").addEventListener("click", () => { current = nextDay(); render(); });
+    $("doneBtn").addEventListener("click", () => {
+      if (done[current]) delete done[current]; else done[current] = todayStr();
+      save(); render();
+    });
+    $("bulkBtn").addEventListener("click", () => {
+      const n = Math.min(current, READY);
+      if (!confirm(`1〜${n}日目に、まとめて「やった」の印をつけますか？`)) return;
+      const t = todayStr();
+      for (let i = 1; i <= n; i++) if (!done[i]) done[i] = t;
+      save(); render();
+    });
+    render();
+  </script>
+</body>
+</html>
