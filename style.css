@@ -197,3 +197,15 @@ footer { margin-top: 64px; text-align: center; color: var(--muted); font-size: 0
 .hero-link:hover h1, .hero-link:focus-visible h1 { color: #fff8e6; }
 .hero-link:focus-visible { outline: 1px dashed var(--gold); outline-offset: 8px; border-radius: 8px; }
 .hero-link:active { opacity: 0.8; }
+
+/* ---- トップの題「空洞の熱帯」を大きく、その下に名前（28日目） ---- */
+.site-title {
+  font-family: "Shippori Mincho B1", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-weight: 800;
+  font-size: clamp(2.8rem, 12vw, 5rem);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-shadow: 0 0 2px #0b1120, 0 3px 24px rgba(0, 0, 0, 0.6);
+}
+.name { font-size: 1.35rem; letter-spacing: 0.3em; margin: 14px 0 0; }
+.name + .en { margin-top: 4px; font-size: 0.9rem; }
