@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>おやのはなし</title>
+<meta name="description" content="親に、週にひとつ質問を送って、思い出話から「これから」の話まで。答えがたまると、人生のグラフと一冊のまとめができます。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<style>
+  /* レイアウト：スマホ1列。上から「今週の質問」→「人生グラフ」→「これまでの答え」→「まとめ」 */
+  :root {
+    --bg: #f6f1ea; --card: #fffdf9; --ink: #2f2a26; --muted: #7a6f66; --line: #e6dccf;
+    --accent: #c0663f; --accent-soft: #f6e3d8; --sky: #4f7fa8; --sky-soft: #e3edf5; --ok: #3f7d58;
+    --display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+    --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #1d1a17; --card: #272320; --ink: #f1e9df; --muted: #b5a99c; --line: #3b342e;
+    --accent: #e48c64; --accent-soft: #3d2a20; --sky: #86b3d8; --sky-soft: #1f2e3a; --ok: #79c497; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #1d1a17; --card: #272320; --ink: #f1e9df; --muted: #b5a99c; --line: #3b342e;
+    --accent: #e48c64; --accent-soft: #3d2a20; --sky: #86b3d8; --sky-soft: #1f2e3a; --ok: #79c497; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.8;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 56px; }
+  .wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 18px; }
+  header { padding-top: 26px; }
+  h1 { font-family: var(--display); font-size: 30px; margin: 0; letter-spacing: .04em; }
+  .lead { color: var(--muted); margin: 6px 0 0; font-size: 15px; }
+  h2 { font-family: var(--display); font-size: 21px; margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+  label { font-weight: 700; font-size: 15px; }
+  input[type=text], textarea, select { width: 100%; font: inherit; font-size: 17px; color: var(--ink); background: var(--bg);
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  textarea { min-height: 120px; resize: vertical; }
+  :focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { font: inherit; font-weight: 700; font-size: 16px; border: 0; border-radius: 999px; padding: 12px 20px; cursor: pointer; background: var(--accent); color: #fff; text-decoration: none; display: inline-block; }
+  .btn.line { background: #06c755; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn.small { padding: 7px 14px; font-size: 14px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .step { display: inline-block; background: var(--sky-soft); color: var(--sky); font-weight: 700; font-size: 13px; border-radius: 999px; padding: 2px 12px; }
+  .q { font-family: var(--display); font-size: 23px; line-height: 1.6; margin: 0; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0; }
+  .faces { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .faces button { font: inherit; font-size: 13px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px; padding: 8px 2px; cursor: pointer; line-height: 1.3; }
+  .faces button b { display: block; font-size: 24px; }
+  .faces button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .progress { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s; }
+  .graph { width: 100%; height: auto; display: block; }
+  .list { display: grid; gap: 10px; }
+  .item { border-left: 4px solid var(--accent); padding: 4px 0 4px 12px; }
+  .item.future { border-color: var(--sky); }
+  .item .iq { font-weight: 700; margin: 0; }
+  .item .ia { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .item .meta { color: var(--muted); font-size: 13px; }
+  .note { font-size: 14px; color: var(--muted); background: var(--sky-soft); border-radius: 12px; padding: 10px 12px; margin: 0; }
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg);
+    padding: 10px 18px; border-radius: 999px; font-size: 15px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  details summary { cursor: pointer; font-weight: 700; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  /* 印刷（家族に渡すまとめ） */
+  @media print {
+    body { background: #fff; color: #000; font-size: 13px; }
+    .noprint { display: none !important; }
+    .card { border: 0; padding: 0; break-inside: avoid; }
+    .print-only { display: block !important; }
+  }
+  .print-only { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="noprint">
+    <h1>おやのはなし</h1>
+    <p class="lead">親に、週にひとつ質問を送ります。思い出話から始めて、さいごに「これから」のことを。答えがたまると、人生のグラフと、家族に渡せるまとめができます。</p>
+  </header>
+
+  <section class="card noprint" id="setup">
+    <h2>はじめに</h2>
+    <div>
+      <label for="who">だれに聞きますか（呼び方）</label>
+      <input type="text" id="who" placeholder="例：お母さん" autocomplete="off">
+    </div>
+    <p class="note">書いた答えは、このスマホの中だけに残ります。どこにも送られません。</p>
+  </section>
+
+  <section class="card noprint" id="now"></section>
+
+  <section class="card" id="graphCard">
+    <h2 id="graphTitle">人生のグラフ</h2>
+    <svg class="graph" id="graph" viewBox="0 0 420 270" role="img" aria-label="人生の山と谷のグラフ"></svg>
+    <p class="hint noprint">答えのあとで選んだ「そのころの気持ち」が、点になって並びます。</p>
+  </section>
+
+  <section class="card" id="answers">
+    <h2>これまでの答え</h2>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="card noprint">
+    <h2>家族に渡す</h2>
+    <p class="hint">「まとめを印刷」を押すと、グラフと答えを一枚にまとめて、印刷や PDF の保存ができます（スマホでは、共有メニューの「プリント」から PDF にできます）。</p>
+    <div class="row">
+      <button class="btn" id="print">まとめを印刷</button>
+    </div>
+    <details>
+      <summary>スマホを替えるときのために（書き出し・読みこみ）</summary>
+      <p class="hint">答えはこのスマホの中だけにあります。スマホを替えたり、ブラウザの記録を消したりすると、消えてしまいます。ときどき「書き出す」で保存しておいてください。</p>
+      <div class="row">
+        <button class="btn ghost small" id="export">書き出す</button>
+        <label class="btn ghost small" for="importFile">読みこむ</label>
+        <input type="file" id="importFile" accept="application/json" hidden>
+        <button class="btn ghost small" id="reset">はじめからやりなおす</button>
+      </div>
+    </details>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const QUESTIONS = [
+  { id: "child1", era: "子ども", q: "子どものころ、いちばん好きだった遊びは？" },
+  { id: "child2", era: "子ども", q: "育った家のまわりは、どんな景色だった？" },
+  { id: "teen",   era: "10代",   q: "学生のころ、夢中になっていたことは？" },
+  { id: "work",   era: "20代",   q: "はじめての仕事は、どんな仕事だった？" },
+  { id: "meet",   era: "20代",   q: "大切な人とは、どこで出会ったの？" },
+  { id: "hard",   era: "30〜40代", q: "子育てや仕事で、いちばん大変だったことは？" },
+  { id: "joy",    era: "30〜40代", q: "これまでで、いちばんうれしかったことは？" },
+  { id: "later",  era: "50代〜", q: "50代をすぎて、変わったなと思うことは？" },
+  { id: "today",  era: "いま",   q: "最近、楽しみにしていることは？" },
+  { id: "home",   era: "これから", future: true, q: "この家のこと、これからどうしたいと思っている？" },
+  { id: "care",   era: "これから", future: true, q: "体が弱くなったら、どこで、どんなふうに暮らしたい？" },
+  { id: "wish",   era: "これから", future: true, q: "家族に、大切にしてほしいことは？" },
+];
+const ERAS = ["子ども", "10代", "20代", "30〜40代", "50代〜", "いま"];
+const FACES = [ { v: -2, f: "😢", t: "つらい" }, { v: -1, f: "😕", t: "すこし" }, { v: 0, f: "😐", t: "ふつう" }, { v: 1, f: "🙂", t: "よい" }, { v: 2, f: "😄", t: "とても" } ];
+const KEY = "oya-no-hanashi-v1";
+
+let state = { who: "", answers: {} };   // answers[id] = { a, mood, date }
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.answers) state = s; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const who = () => state.who.trim() || "お母さん";
+let skipped = new Set();
+let draftMood = null;
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2000); }
+
+let editing = null;   // 「直す」を押した質問の id
+function current() {
+  if (editing) return QUESTIONS.find(q => q.id === editing);
+  return QUESTIONS.find(q => !state.answers[q.id] && !skipped.has(q.id)) || QUESTIONS.find(q => !state.answers[q.id]);
+}
+
+function message(q) {
+  const intro = q.future
+    ? `${who()}、これからのことも、ひとつ聞いてもいい？\n`
+    : `${who()}、ひとつ聞いてもいい？\n`;
+  return `${intro}${q.q}\n\n声で送ってくれても大丈夫だよ。`;
+}
+
+function renderNow() {
+  const q = current();
+  const done = QUESTIONS.filter(x => state.answers[x.id]).length;
+  const bar = `<div class="progress" aria-label="${done} / ${QUESTIONS.length}"><i style="width:${done / QUESTIONS.length * 100}%"></i></div>`;
+  if (!q) {
+    $("now").innerHTML = `<h2>ぜんぶ聞けました</h2>${bar}<p>${esc(who())}の話が ${QUESTIONS.length} こ、たまりました。下の「まとめを印刷」から、家族に渡せる形にできます。</p>`;
+    return;
+  }
+  const n = QUESTIONS.indexOf(q) + 1;
+  $("now").innerHTML = `
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">今週の質問</h2><span class="step">${n} / ${QUESTIONS.length}　${esc(q.era)}</span></div>
+    ${bar}
+    <p class="q">${esc(q.q)}</p>
+    <div class="row">
+      <a class="btn line" id="sendLine" href="https://line.me/R/msg/text/?${encodeURIComponent(message(q))}" target="_blank" rel="noopener">LINE で送る</a>
+      <button class="btn ghost small" id="copyQ">質問の文をコピー</button>
+    </div>
+    <p class="hint">返事が来たら、その文を下に貼ってください。声の返事なら、聞きながら要点を書くだけで大丈夫です。</p>
+    <label for="ans">${esc(who())}の答え</label>
+    <textarea id="ans" placeholder="返事をここに貼る"></textarea>
+    ${q.future ? "" : `<div><label>そのころの気持ち（わかる範囲で）</label><div class="faces" id="faces">${FACES.map(f => `<button type="button" data-v="${f.v}" aria-pressed="${draftMood === f.v}"><b>${f.f}</b>${f.t}</button>`).join("")}</div></div>`}
+    <div class="row">
+      <button class="btn" id="saveA">答えを残す</button>
+      <button class="btn ghost small" id="skip">あとで聞く</button>
+    </div>`;
+  $("copyQ").onclick = () => copy(message(q));
+  $("skip").onclick = () => { if (editing) { editing = null; } else { skipped.add(q.id); } draftMood = null; render(); };
+  if (editing) $("skip").textContent = "直すのをやめる";
+  if (!q.future) $("faces").querySelectorAll("button").forEach(b => b.onclick = () => { draftMood = +b.dataset.v; $("faces").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); });
+  $("saveA").onclick = () => {
+    const a = $("ans").value.trim();
+    if (!a) { toast("答えを書いてから残してください"); return; }
+    state.answers[q.id] = { a, mood: q.future ? null : draftMood, date: new Date().toISOString().slice(0, 10) };
+    draftMood = null; editing = null; save(); render(); toast("残しました");
+  };
+  if (editing && state.answers[q.id]) $("ans").value = state.answers[q.id].a;
+}
+
+function renderGraph() {
+  $("graphTitle").textContent = `${who()}の人生のグラフ`;
+  const W = 420, H = 270, L = 40, R = 12, T = 22, B = 46;   // スマホで文字が小さくならないよう、絵の幅をせまくしている
+  const xs = i => L + (W - L - R) * (i + 0.5) / ERAS.length;
+  const ys = v => T + (H - T - B) * (2 - v) / 4;
+  let g = "";
+  for (let v = -2; v <= 2; v++) g += `<line x1="${L}" x2="${W - R}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)" stroke-width="${v === 0 ? 2 : 1}"/>`;
+  g += `<text x="${L - 8}" y="${ys(2) + 5}" text-anchor="end" font-size="20">😄</text><text x="${L - 8}" y="${ys(0) + 6}" text-anchor="end" font-size="20">😐</text><text x="${L - 8}" y="${ys(-2) + 6}" text-anchor="end" font-size="20">😢</text>`;
+  ERAS.forEach((e, i) => g += `<text x="${xs(i)}" y="${H - 16}" text-anchor="middle" font-size="14" font-weight="700" fill="var(--muted)">${e}</text>`);
+  const pts = [];
+  ERAS.forEach((e, i) => {
+    const moods = QUESTIONS.filter(q => q.era === e && state.answers[q.id] && state.answers[q.id].mood !== null && state.answers[q.id].mood !== undefined).map(q => state.answers[q.id].mood);
+    if (moods.length) pts.push([xs(i), ys(moods.reduce((a, b) => a + b, 0) / moods.length)]);
+  });
+  if (pts.length > 1) {
+    const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+    g += `<path d="${d} L ${pts[pts.length - 1][0]} ${ys(-2)} L ${pts[0][0]} ${ys(-2)} Z" fill="var(--accent-soft)" opacity=".7"/>`;
+    g += `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+  pts.forEach(p => g += `<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="var(--card)" stroke="var(--accent)" stroke-width="3.5"/>`);
+  if (!pts.length) g += `<text x="${W / 2}" y="${ys(0) - 14}" text-anchor="middle" font-size="15" fill="var(--muted)">答えがたまると、ここに線がのびていきます</text>`;
+  $("graph").innerHTML = g;
+}
+
+function renderList() {
+  const done = QUESTIONS.filter(q => state.answers[q.id]);
+  if (!done.length) { $("list").innerHTML = `<p class="hint">まだありません。最初の質問を送ってみましょう。</p>`; return; }
+  $("list").innerHTML = done.map(q => {
+    const a = state.answers[q.id], f = FACES.find(x => x.v === a.mood);
+    return `<div class="item ${q.future ? "future" : ""}"><p class="iq">${esc(q.q)}</p><p class="ia">${esc(a.a)}</p>
+      <span class="meta">${esc(q.era)}${f ? "　" + f.f : ""}　${esc(a.date)}</span>
+      <button class="btn ghost small noprint" data-edit="${q.id}" style="margin-left:8px">直す</button></div>`;
+  }).join("");
+  $("list").querySelectorAll("[data-edit]").forEach(b => b.onclick = () => {
+    editing = b.dataset.edit; draftMood = state.answers[editing].mood;
+    render(); window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
+function render() { renderNow(); renderGraph(); renderList(); }
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("コピーしました"); }
+  catch (e) { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); toast("コピーしました"); } catch (e2) { toast("コピーできませんでした"); } t.remove(); }
+}
+
+$("who").value = state.who;
+$("who").addEventListener("input", e => { state.who = e.target.value; save(); render(); });
+$("print").onclick = () => window.print();
+$("export").onclick = () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `おやのはなし_${new Date().toISOString().slice(0, 10)}.json`; a.click();
+};
+$("importFile").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  f.text().then(t => { const s = JSON.parse(t); if (s && s.answers) { state = s; save(); $("who").value = state.who || ""; render(); toast("読みこみました"); } })
+    .catch(() => toast("読みこめませんでした"));
+};
+let resetArmed = false;
+$("reset").onclick = () => {
+  if (!resetArmed) { resetArmed = true; $("reset").textContent = "もう一度押すと、すべて消えます"; setTimeout(() => { resetArmed = false; $("reset").textContent = "はじめからやりなおす"; }, 4000); return; }
+  state = { who: "", answers: {} }; save(); $("who").value = ""; resetArmed = false; $("reset").textContent = "はじめからやりなおす"; render(); toast("はじめからにしました");
+};
+render();
+</script>
+</body>
+</html>
