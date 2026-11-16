@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Series Contents | Lawrence</title>
+  <meta name="description" content="Contents of the series Lawrence writes on note.">
+  <link rel="icon" type="image/png" href="../icon.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;800&display=swap">
+  <style>
+    :root { --night: #0b1222; --deep: #121b33; --ink: #e9edf6; --sub: #a9b3c9; --gold: #e8c77a; --line: rgba(255,255,255,.12); }
+    * { box-sizing: border-box; }
+    /* 文字はすべて1.5倍（ふつうの16px → 24px）。題名だけは、さらに大きく2倍 */
+    html { font-size: 150%; }  /* なめらかに動くのは、開いて場所が決まったあとから（下の動きの中で入れる） */
+    body { margin: 0; background: var(--night); color: var(--ink); font-family: "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif; line-height: 1.8; -webkit-font-smoothing: antialiased; }
+    a { color: var(--gold); }
+
+    /* ---------- いちばん上：写真が左右に流れるスライド ---------- */
+    .hero { position: relative; height: 46svh; min-height: 380px; max-height: 520px; overflow: hidden; touch-action: pan-y; }
+    .track { display: flex; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.35,1); }
+    .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; color: #fff; text-decoration: none; }
+    .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12) translateX(2%); transition: transform 7s ease-out; }
+    .slide.on img { transform: scale(1.02) translateX(-2%); }
+    .slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,24,.65) 0%, rgba(8,12,24,.2) 45%, rgba(8,12,24,.88) 100%); }
+    .cap { position: absolute; left: 22px; right: 22px; bottom: 56px; z-index: 2; opacity: 0; transform: translateY(14px); transition: opacity .8s .5s, transform .8s .5s; }
+    .slide.on .cap { opacity: 1; transform: none; }
+    .cap small { display: block; font-size: .74rem; letter-spacing: .2em; color: var(--gold); }
+    .cap b { font-size: 1.05rem; font-weight: 600; }
+    .cap b::after { content: "　→"; color: var(--gold); }
+    .title { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: 34px 22px 0; text-align: center; color: inherit; text-decoration: none; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+    .title h1 { margin: 0; font-family: "Shippori Mincho B1", serif; font-size: min(17.5vw, 4.27rem); line-height: 1.25; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
+    .title .en { margin: 2px 0 0; font-size: .7rem; letter-spacing: .35em; color: var(--sub); }
+    .title .lead { margin: 10px 0 0; font-size: .88rem; }
+    /* スマホでは、下の写真の説明とかぶるので出さない（記事のタイトルの後ろの ↗ で、押せることは分かる） */
+    @media (max-width: 640px) { .title .lead { display: none; } }
+    .dots { position: absolute; z-index: 4; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; gap: 10px; }
+    .dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 99px; background: rgba(255,255,255,.45); cursor: pointer; transition: width .4s, background .4s; }
+    .dots button.on { width: 28px; background: var(--gold); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 0 0 40px; }
+    .back { display: inline-block; margin: 18px 22px 0; font-size: .88rem; text-decoration: none; }
+
+    /* ---------- 連載の一覧：横に流れる小さなカード ---------- */
+    .chips { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 16px 22px 10px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex: 0 0 auto; width: 200px; height: 134px; position: relative; border-radius: 12px; overflow: hidden; scroll-snap-align: start; color: #fff; text-decoration: none; box-shadow: 0 8px 20px rgba(0,0,0,.4); }
+    .chip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .chip::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,10,20,.1), rgba(6,10,20,.85)); }
+    .chip span { position: absolute; z-index: 1; left: 10px; right: 10px; bottom: 8px; font-size: .74rem; line-height: 1.4; font-weight: 600; }
+    .hint { margin: 0 22px; font-size: .74rem; color: var(--sub); text-align: right; }
+
+    /* ---------- 連載ごと ---------- */
+    .series { margin: 40px 22px 0; scroll-margin-top: 28px; }
+    .banner { position: relative; height: 240px; border-radius: 16px; overflow: hidden; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
+    .banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 1.4s ease-out; }
+    .series.in .banner img { transform: scale(1); }
+    .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,10,20,.05) 20%, rgba(6,10,20,.9)); }
+    .btext { position: absolute; z-index: 1; left: 16px; right: 16px; bottom: 12px; }
+    .btext h2 { margin: 0; font-family: "Shippori Mincho B1", serif; font-size: 1.3rem; line-height: 1.45; }
+    .btext .meta { margin: 2px 0 0; font-size: .74rem; color: #cfd6e6; }
+    .episodes { list-style: none; margin: 10px 0 0; padding: 0; }
+    .episodes li { display: flex; flex-direction: column; padding: 11px 4px; border-bottom: 1px solid var(--line); }
+    .episodes .date { font-size: .7rem; color: var(--sub); letter-spacing: .05em; }
+    .episodes a { color: var(--ink); text-decoration: none; font-size: .95rem; }
+    .episodes a::after { content: " ↗"; color: var(--gold); font-size: .8rem; }
+    .more { margin: 36px 22px 0; }
+    .more a { display: block; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); background: rgba(255,255,255,.03); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s, transform .9s; }
+    .reveal.in { opacity: 1; transform: none; }
+    footer { padding: 48px 22px 0; text-align: center; font-size: .78rem; color: var(--sub); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .track, .slide img, .cap, .reveal, .banner img { transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" id="hero">
+    <div class="track" id="track">
+      <a class="slide on" href="#kudo">
+        <img src="../img/tropic.jpg" alt="" fetchpriority="high">
+        <div class="cap"><small>NOVEL</small><b>The Hollow Tropics</b></div>
+      </a>
+      <a class="slide" href="#oxford">
+        <img src="../img/oxford.jpg" alt="" loading="lazy">
+        <div class="cap"><small>ESSAY</small><b>From Below Average to Oxford</b></div>
+      </a>
+      <a class="slide" href="#keaton">
+        <img src="../img/toronto.jpg" alt="" loading="lazy">
+        <div class="cap"><small>ESSAY</small><b>To Keaton's Alma Mater</b></div>
+      </a>
+      <a class="slide" href="#challenge">
+        <img src="../img/desk.jpg" alt="" loading="lazy">
+        <div class="cap"><small>CHALLENGE</small><b>My 30-Day AI Challenge</b></div>
+      </a>
+    </div>
+    <a class="title" href="index.html" title="Back to the top page">
+      <h1>Contents</h1>
+      <p class="en">Lawrence Sentrio</p>
+      <p class="lead">Tap a title to open the article on note (in Japanese).</p>
+    </a>
+    <div class="dots" id="dots" aria-label="Photo slides"></div>
+  </header>
+
+  <main>
+    <a class="back" href="index.html">← Back to profile</a>
+    <nav aria-label="List of series">
+      <div class="chips" data-arrows>
+        <a class="chip" href="#friend"><img src="../img/window.jpg" alt="" loading="lazy"><span>Phone Calls with a Friend</span></a>
+        <a class="chip" href="#kudo"><img src="../img/tropic.jpg" alt="" loading="lazy"><span>The Hollow Tropics</span></a>
+        <a class="chip" href="#oxford"><img src="../img/oxford.jpg" alt="" loading="lazy"><span>From Below Average to Oxford</span></a>
+        <a class="chip" href="#keaton"><img src="../img/toronto.jpg" alt="" loading="lazy"><span>To Keaton's Alma Mater</span></a>
+        <a class="chip" href="#english"><img src="../img/library.jpg" alt="" loading="lazy"><span>On English and the TOEFL</span></a>
+        <a class="chip" href="#essay5"><img src="../img/sea.jpg" alt="" loading="lazy"><span>Five Essays</span></a>
+        <a class="chip" href="#challenge"><img src="../img/desk.jpg" alt="" loading="lazy"><span>Age 54: A 30-Day Challenge with Claude Code</span></a>
+      </div>
+      <p class="hint">← Swipe to see more →</p>
+    </nav>
+
+    <section class="series reveal" id="friend">
+      <div class="banner">
+        <img src="../img/window.jpg" alt="A lit window at night" loading="lazy">
+        <div class="btext"><h2>Phone Calls with a Friend</h2><p class="meta">Essay series · 6 articles · 2026.11.01–2026.11.12</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/n2189eae26234" target="_blank" rel="noopener">Three Days I Couldn't Move (#1)</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/n0f4633f919cb" target="_blank" rel="noopener">Words I Could No Longer Say (#2)</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/n29d53da615b2" target="_blank" rel="noopener">Parents, Money, and Five Years' Worth of Numbers (#3)</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/ncae701d4d18d" target="_blank" rel="noopener">I Can't Go Out Alone (#4)</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/n5550068d7502" target="_blank" rel="noopener">Until I Could See the Floor (#5)</a></li>
+          <li><span class="date">2026.11.12</span><a href="https://note.com/lawrence_sentrio/n/ne0f544c1c29b" target="_blank" rel="noopener">I Said "It Was Fine" and Got Fired (#6)</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="kudo">
+      <div class="banner">
+        <img src="../img/tropic.jpg" alt="Palm leaves in the moonlight" loading="lazy">
+        <div class="btext"><h2>The Hollow Tropics</h2><p class="meta">Linked short stories · 9 episodes · 2026.10.26–2026.11.01</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.10.26</span><a href="https://note.com/lawrence_sentrio/n/n188f0911d6b9" target="_blank" rel="noopener">Tomato School</a></li>
+          <li><span class="date">2026.10.29</span><a href="https://note.com/lawrence_sentrio/n/n060630aae604" target="_blank" rel="noopener">Behind the Book Cover</a></li>
+          <li><span class="date">2026.10.31</span><a href="https://note.com/lawrence_sentrio/n/n27a6012e51d4" target="_blank" rel="noopener">A Japanese Sword and Ramen</a></li>
+          <li><span class="date">2026.10.31</span><a href="https://note.com/lawrence_sentrio/n/n299a8f4f9111" target="_blank" rel="noopener">Snow on the Skin</a></li>
+          <li><span class="date">2026.10.31</span><a href="https://note.com/lawrence_sentrio/n/na2106ff16c25" target="_blank" rel="noopener">A Raincoat at Fuji Rock</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/nfc0fb9fd2f80" target="_blank" rel="noopener">The Frozen Bus Stop</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/nc0c1b52915fc" target="_blank" rel="noopener">Cream-Colored Dishes</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/na2d67ef58b29" target="_blank" rel="noopener">Poi-Poi</a></li>
+          <li><span class="date">2026.11.01</span><a href="https://note.com/lawrence_sentrio/n/n9ccb0bd92cff" target="_blank" rel="noopener">The Hollow Tropics (Final Episode)</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="oxford">
+      <div class="banner">
+        <img src="../img/oxford.jpg" alt="The Radcliffe Camera in Oxford" loading="lazy">
+        <div class="btext"><h2>From Below Average to Oxford</h2><p class="meta">Series · 10 articles · 2026.11.02–2026.11.10</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/nc8ab6bd316f2" target="_blank" rel="noopener">#001 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/n1718d1020ac8" target="_blank" rel="noopener">#002 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/n7b5bc124b4de" target="_blank" rel="noopener">#003 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/n2d6aeea3b4ad" target="_blank" rel="noopener">#004 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/nc817eebd2348" target="_blank" rel="noopener">#005 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/n4e3f116561aa" target="_blank" rel="noopener">#006 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/n0d696940d2d4" target="_blank" rel="noopener">#007 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.02</span><a href="https://note.com/lawrence_sentrio/n/nf70a3f6fe797" target="_blank" rel="noopener">#008 From Below Average to Oxford</a></li>
+          <li><span class="date">2026.11.10</span><a href="https://note.com/lawrence_sentrio/n/n82e090225418" target="_blank" rel="noopener">#009 Starting Over, and Runner-Up Again</a></li>
+          <li><span class="date">2026.11.10</span><a href="https://note.com/lawrence_sentrio/n/nc3cfd1f43289" target="_blank" rel="noopener">#010 "You're a Baseball Game"</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="keaton">
+      <div class="banner">
+        <img src="../img/toronto.jpg" alt="Toronto at dusk" loading="lazy">
+        <div class="btext"><h2>To Keaton's Alma Mater</h2><p class="meta">Studying abroad, from Toronto to Oxford · 5 articles · 2026.11.10–2026.11.13</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.11.10</span><a href="https://note.com/lawrence_sentrio/n/n7d7b1e7bb267" target="_blank" rel="noopener">Part 1: A Single Manga</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/naddb18e5989a" target="_blank" rel="noopener">Part 2: Toronto, the Lowest Class</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n187e42213f04" target="_blank" rel="noopener">Part 3: The Cemetery on a Frozen Hill</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/nb61924ad7cbb" target="_blank" rel="noopener">Part 4: The Day I Turned Down an Offer</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/nf92d5de03ef6" target="_blank" rel="noopener">Part 5: The Morning of the Black Gown</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="english">
+      <div class="banner">
+        <img src="../img/library.jpg" alt="Library shelves lined with lights" loading="lazy">
+        <div class="btext"><h2>On English and the TOEFL</h2><p class="meta">Series · 5 articles · 2026.11.13–2026.11.14</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n6b8075d66259" target="_blank" rel="noopener">Part 1: A Score of 102</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/ne6987cab2e15" target="_blank" rel="noopener">Part 2: The Day My Exam English Didn't Work</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n9e178e172441" target="_blank" rel="noopener">Part 3: Six Months Camped in the Library</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n75d2973e24a9" target="_blank" rel="noopener">Part 4: Over-Preparing Like No One Else</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n1b2c71b467b1" target="_blank" rel="noopener">Part 5: English After Getting In</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="essay5">
+      <div class="banner">
+        <img src="../img/sea.jpg" alt="A calm sea at dawn" loading="lazy">
+        <div class="btext"><h2>Five Essays</h2><p class="meta">A series from February 2026 · 5 articles · 2026.02.03–2026.02.05</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.02.03</span><a href="https://note.com/lawrence_sentrio/n/n28fa43b1a0e1" target="_blank" rel="noopener">#001 [Part 1] Where Others Feel Joy, I Can't</a></li>
+          <li><span class="date">2026.02.04</span><a href="https://note.com/lawrence_sentrio/n/n28c2bc2fb96d" target="_blank" rel="noopener">#002 [Part 2] When I "Gave Up" at the Bottom of Despair, the World Went Quiet</a></li>
+          <li><span class="date">2026.02.04</span><a href="https://note.com/lawrence_sentrio/n/na2b8fb315f90" target="_blank" rel="noopener">#003 [Part 3] Fun and Joy Were Actually "Stress"</a></li>
+          <li><span class="date">2026.02.04</span><a href="https://note.com/lawrence_sentrio/n/na7d00c6b2a4f" target="_blank" rel="noopener">#004 [Part 4] "Growth" Is Subtraction, Not Addition</a></li>
+          <li><span class="date">2026.02.05</span><a href="https://note.com/lawrence_sentrio/n/n86a0a51d4924" target="_blank" rel="noopener">#005 [Final] A One-in-Ten-Million Loneliness, and Two Who Understood</a></li>
+      </ol>
+    </section>
+    <section class="series reveal" id="challenge">
+      <div class="banner">
+        <img src="../img/desk.jpg" alt="A desk by the window at night" loading="lazy">
+        <div class="btext"><h2>Age 54: A 30-Day Challenge with Claude Code</h2><p class="meta">Making one thing with AI every day · 26 articles · 2026.11.13–2026.11.15</p></div>
+      </div>
+      <ol class="episodes">
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/nefdb71f98c8e" target="_blank" rel="noopener">Day 1 (Week 1): From a Tool for Writing to a Tool for Making Things</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n972750881b1c" target="_blank" rel="noopener">Day 2 (Week 1): Letting AI Read My Essay</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/na837b7a8b9bb" target="_blank" rel="noopener">Day 3 (Week 1): Having AI Retitle My Essays</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n794cb5cd01be" target="_blank" rel="noopener">Day 4 (Week 1): Having AI Proofread My Manuscript</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n58786765b94c" target="_blank" rel="noopener">Day 5 (Week 1): Cutting Five 140-Character Posts from a 70,000-Character Novel</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n1ff5482df6e0" target="_blank" rel="noopener">Day 6 (Week 1): How "Ore" Became "Boku"</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/nc1baa18d9804" target="_blank" rel="noopener">Looking Back on Week 1</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n8cc91cea3a07" target="_blank" rel="noopener">Getting Ahead: Trying Next Week's Tasks Early</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n4efab1a3b621" target="_blank" rel="noopener">Day 8 (Week 2): Reading My note Through Numbers</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/n9089b8970d63" target="_blank" rel="noopener">Day 9 (Week 2): Reading My note Through Numbers</a></li>
+          <li><span class="date">2026.11.13</span><a href="https://note.com/lawrence_sentrio/n/nd0a59259e6d2" target="_blank" rel="noopener">Day 9 (Week 2): Likes Don't Pile Up</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/nbd5084ac18d2" target="_blank" rel="noopener">Day 10 (Week 2): Before Renaming 328 Photos at Once</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n398febe16ce5" target="_blank" rel="noopener">Day 11 (Week 2): I Made 328 Images and Not One Was Usable</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n77ad8ec6f5f4" target="_blank" rel="noopener">Day 12 (Week 2): Choosing Twelve from a Hundred Manuscripts</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/neea5ac8fb3d4" target="_blank" rel="noopener">Day 13 (Week 2): A One-Line Log and a Promise Not to Rush</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/ndb9782285e77" target="_blank" rel="noopener">Day 14 (Week 2): A Program Is a Recipe</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/nfb45ae084102" target="_blank" rel="noopener">Day 15 (Week 3): Making Just One Page of My Own</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n236f0a7dbd3c" target="_blank" rel="noopener">Days 16–17 (Week 3): Adding a Night Sky, Linking the Contents</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/nf4814a4f09e9" target="_blank" rel="noopener">Day 18 (Week 3): The Next Task Isn't Set by the Date</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n2b70ee242bdb" target="_blank" rel="noopener">Day 19 (Week 3): Creating Save Points for My Files</a></li>
+          <li><span class="date">2026.11.14</span><a href="https://note.com/lawrence_sentrio/n/n610eef30392d" target="_blank" rel="noopener">Week 3 Wrap-Up: At 54, I Built a Homepage in Two Days</a></li>
+          <li><span class="date">2026.11.15</span><a href="https://note.com/lawrence_sentrio/n/n0fb241e49339" target="_blank" rel="noopener">Extra: Separating Names to Prepare for Business</a></li>
+          <li><span class="date">2026.11.15</span><a href="https://note.com/lawrence_sentrio/n/nce22ed3e4f2f" target="_blank" rel="noopener">Day 22 (Week 4): Checking, Behind the Scenes, the Promises Made on Paper</a></li>
+          <li><span class="date">2026.11.15</span><a href="https://note.com/lawrence_sentrio/n/ne41df992178e" target="_blank" rel="noopener">Day 23 (Week 4): Changing the Season, Not the Color</a></li>
+          <li><span class="date">2026.11.15</span><a href="https://note.com/lawrence_sentrio/n/n28edeae12854" target="_blank" rel="noopener">Day 24 (Week 4): Something Real to Show People, Not Just a Record</a></li>
+          <li><span class="date">2026.11.15</span><a href="https://note.com/lawrence_sentrio/n/n32a1d0a277a0" target="_blank" rel="noopener">Day 25 (Week 4): The One Who Dreaded Opening It Was Me</a></li>
+      </ol>
+    </section>
+
+    <p class="more"><a href="https://note.com/lawrence_sentrio" target="_blank" rel="noopener">See all articles on note →</a></p>
+
+    <footer>
+      <p>November 2026 · Made with Claude Code<br>Photos: Unsplash</p>
+    </footer>
+  </main>
+
+  <script>
+    // いちばん上の写真を、左右にすべらせて切りかえる（5秒ごと。指でスワイプしても切りかわる）
+    (function () {
+      var track = document.getElementById('track');
+      var slides = track.children;
+      var dots = document.getElementById('dots');
+      var n = slides.length, i = 0, timer = null;
+      var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      for (var k = 0; k < n; k++) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Photo ' + (k + 1));
+        (function (k) { b.onclick = function () { go(k); restart(); }; })(k);
+        dots.appendChild(b);
+      }
+      function go(k) {
+        i = (k + n) % n;
+        track.style.transform = 'translateX(' + (-100 * i) + '%)';
+        for (var j = 0; j < n; j++) {
+          slides[j].classList.toggle('on', j === i);
+          dots.children[j].classList.toggle('on', j === i);
+        }
+      }
+      function restart() {
+        clearInterval(timer);
+        if (!still) timer = setInterval(function () { go(i + 1); }, 5000);
+      }
+      var x0 = null, moved = false;
+      var hero = document.getElementById('hero');
+      hero.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; moved = false; }, { passive: true });
+      hero.addEventListener('touchend', function (e) {
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) { moved = true; go(dx < 0 ? i + 1 : i - 1); restart(); }
+        x0 = null;
+      });
+      // スワイプしたときは、写真を押したことにしない
+      track.addEventListener('click', function (e) { if (moved) { e.preventDefault(); moved = false; } });
+      go(0); restart();
+
+      // 連載は、画面に入ったらふわっと出す
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+      // #oxford などで直接開いたときは、その連載をすぐ見せる
+      // ブラウザによっては、開いたときにその場所まで動かないことがあるので、写真が読みこまれたあとに自分で動かす
+      var t = location.hash && document.querySelector(location.hash);
+      if (t) t.classList.add('in');
+      addEventListener('load', function () {
+        if (t) t.scrollIntoView({ behavior: 'instant' });
+        document.documentElement.style.scrollBehavior = 'smooth';
+      });
+    })();
+  </script>
+  <!-- 横にすべるカードの切りかえ：スマホは指ですべらせる（「← Swipe to see more →」を出す）。
+       パソコン（マウスで操作する画面）は、案内を隠して、左右の ◀ ▶ を押して動かす -->
+  <style>
+    .hscroll { position: relative; }
+    .hscroll .arrow { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .hint { display: none; }
+      .hscroll .arrow { display: flex; align-items: center; justify-content: center; position: absolute; z-index: 5; top: 50%; width: 48px; height: 48px; margin-top: -28px; border: 1px solid rgba(232,199,122,.6); border-radius: 50%; background: rgba(11,18,34,.85); color: #e8c77a; font-size: 18px; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45); transition: opacity .3s, background .3s; }
+      .hscroll .arrow:hover { background: rgba(30,44,80,.95); }
+      .hscroll .arrow.prev { left: 4px; }
+      .hscroll .arrow.next { right: 4px; }
+      .hscroll .arrow[disabled] { opacity: 0; pointer-events: none; }
+    }
+  </style>
+  <script>
+    (function () {
+      document.querySelectorAll('[data-arrows]').forEach(function (row) {
+        var wrap = document.createElement('div');
+        wrap.className = 'hscroll';
+        row.parentNode.insertBefore(wrap, row);
+        wrap.appendChild(row);
+        function make(cls, label, text, dir) {
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'arrow ' + cls; b.setAttribute('aria-label', label); b.textContent = text;
+          b.addEventListener('click', function () {
+            var first = row.firstElementChild;
+            var step = first ? first.getBoundingClientRect().width + 12 : row.clientWidth * 0.8;
+            row.scrollBy({ left: dir * step, behavior: 'smooth' });
+          });
+          wrap.appendChild(b);
+          return b;
+        }
+        var prev = make('prev', 'Previous', '◀', -1), next = make('next', 'Next', '▶', 1);
+        function update() {
+          var max = row.scrollWidth - row.clientWidth - 2;
+          prev.disabled = row.scrollLeft <= 2;
+          next.disabled = row.scrollLeft >= max;
+        }
+        row.addEventListener('scroll', update, { passive: true });
+        addEventListener('resize', update);
+        update();
+      });
+    })();
+  </script>
+  <!-- 右側についてくる「トップへ」：右の細い線が、いまページのどのあたりかを金色で示す。丸いボタンを押すと、いちばん上へ戻る -->
+  <style>
+    .rail { position: fixed; z-index: 50; top: 18vh; right: 6px; width: 4px; height: 52vh; border-radius: 4px; background: rgba(255,255,255,.12); opacity: 0; transition: opacity .4s; pointer-events: none; }
+    .rail i { display: block; width: 100%; height: 0; border-radius: 4px; background: #e8c77a; }
+    .totop { position: fixed; z-index: 51; right: 14px; bottom: 18px; width: 64px; height: 64px; border: 1px solid rgba(232,199,122,.6); border-radius: 50%; background: rgba(11,18,34,.82); color: #e8c77a; font: 600 13px/1.1 "Hiragino Sans", "Yu Gothic UI", sans-serif; letter-spacing: .05em; cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transform: translateY(16px); transition: opacity .35s, transform .35s; pointer-events: none; }
+    .totop span { display: block; font-size: 20px; line-height: 1; margin-bottom: 2px; }
+    .show .rail, .show .totop { opacity: 1; }
+    .show .totop { transform: none; pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) { .rail, .totop { transition: none; } }
+  </style>
+  <div id="totopBox">
+    <div class="rail" aria-hidden="true"><i id="railFill"></i></div>
+    <button class="totop" type="button" aria-label="Back to top"><span>▲</span>TOP</button>
+  </div>
+  <script>
+    (function () {
+      var box = document.getElementById('totopBox'), fill = document.getElementById('railFill');
+      function update() {
+        var max = document.documentElement.scrollHeight - innerHeight;
+        var y = scrollY;
+        box.classList.toggle('show', y > 300);
+        fill.style.height = (max > 0 ? Math.min(100, y / max * 100) : 0) + '%';
+      }
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      box.querySelector('.totop').addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+      update();
+    })();
+  </script>
+  <!-- 日本語と英語の切りかえ（右上にずっと出ている）。押すと、同じページの同じ場所の、もう一方の言葉のページへ移る。
+       ja は、このページの言葉（ja か en）。作るときに入れかえる -->
+  <style>
+    .langsw { position: fixed; z-index: 60; top: 8px; right: 8px; display: flex; align-items: center; gap: 2px; padding: 2px 2px 2px 8px; border: 1px solid rgba(232,199,122,.5); border-radius: 99px; background: rgba(11,18,34,.72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgba(0,0,0,.4); font: 600 11px/1 "Hiragino Sans", "Yu Gothic UI", "Segoe UI", sans-serif; letter-spacing: .04em; }
+    .langsw svg { width: 14px; height: 14px; margin-right: 3px; flex: 0 0 auto; }
+    .langsw a { display: block; padding: 6px 10px; border-radius: 99px; color: #cfd6e6; text-decoration: none; transition: background .25s, color .25s; }
+    .langsw a:hover { color: #e8c77a; }
+    .langsw a.on { background: #e8c77a; color: #0b1222; cursor: default; }
+    .hero .title { margin-top: 16px; }  /* 右上の切りかえと、題名が重ならないように */
+    @media (prefers-reduced-motion: reduce) { .langsw a { transition: none; } }
+  </style>
+  <nav class="langsw" id="langSw" aria-label="言語 / Language">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#e8c77a" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg>
+    <a data-lang="ja" lang="ja" href="#">日本語</a>
+    <a data-lang="en" lang="en" href="#">EN</a>
+  </nav>
+  <script>
+    (function () {
+      var cur = 'en';
+      var file = location.pathname.split('/').pop() || 'index.html';
+      var other = cur === 'ja' ? 'en/' + file : '../' + file;
+      document.querySelectorAll('#langSw a').forEach(function (a) {
+        if (a.dataset.lang === cur) {
+          a.classList.add('on');
+          a.setAttribute('aria-current', 'page');
+          a.addEventListener('click', function (e) { e.preventDefault(); });
+          return;
+        }
+        a.href = other;
+        a.addEventListener('click', function (e) {
+          // 金色の印を、押したほうへ移してから、ページを移る（同じ場所 #oxford なども持っていく）
+          e.preventDefault();
+          document.querySelector('#langSw a.on').classList.remove('on');
+          a.classList.add('on');
+          setTimeout(function () { location.href = other + location.hash; }, 180);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
