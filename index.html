@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>空洞の熱帯｜ローレンス</title>
   <meta name="description" content="小説とエッセイを書いているローレンスの自己紹介ページです。">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;800&display=swap">
@@ -13,7 +15,8 @@
       --night: #0b1222; --deep: #121b33; --ink: #e9edf6; --sub: #a9b3c9; --gold: #e8c77a; --line: rgba(255,255,255,.12);
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    /* 文字はすべて1.5倍（ふつうの16px → 24px）。題名だけは、さらに大きく2倍 */
+    html { scroll-behavior: smooth; font-size: 150%; }
     body { margin: 0; background: var(--night); color: var(--ink); font-family: "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif; line-height: 1.9; -webkit-font-smoothing: antialiased; }
     a { color: var(--gold); }
     .mincho { font-family: "Shippori Mincho B1", serif; }
@@ -31,7 +34,8 @@
     .cap b { font-size: 1.15rem; font-weight: 600; }
 
     .title { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: 40px 22px 0; text-align: center; pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
-    .title h1 { margin: 0; font-size: clamp(2.6rem, 12vw, 4.4rem); font-weight: 800; letter-spacing: .12em; }
+    /* 題名は前の2倍（いちばん大きくて140px）。スマホでは、画面の幅に収まるいちばん大きな大きさ */
+    .title h1 { margin: 0; font-size: min(17.5vw, 5.84rem); line-height: 1.25; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
     .title .name { margin: 6px 0 0; font-size: 1.05rem; letter-spacing: .3em; }
     .title .en { margin: 0; font-size: .72rem; letter-spacing: .35em; color: var(--sub); }
     .title .lead { margin: 18px 0 0; font-size: .95rem; }
@@ -58,7 +62,7 @@
     /* ---------- 書いているもの：横に流れるカード ---------- */
     .cards { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 22px 18px; margin: 0 -22px; scrollbar-width: none; }
     .cards::-webkit-scrollbar { display: none; }
-    .card { flex: 0 0 78%; max-width: 320px; scroll-snap-align: center; position: relative; height: 380px; border-radius: 18px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
+    .card { flex: 0 0 82%; max-width: 420px; scroll-snap-align: center; position: relative; height: 470px; border-radius: 18px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
     .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 1.2s ease-out; }
     .card:hover img, .card.in img { transform: scale(1); }
     .card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(6,10,20,.92)); }
@@ -131,7 +135,7 @@
 
     <section class="reveal">
       <h2>書いているもの</h2>
-      <div class="cards">
+      <div class="cards" data-arrows>
         <a class="card" href="mokuji.html#kudo">
           <img src="img/tropic.jpg" alt="" loading="lazy">
           <div class="body"><div class="kind">連作短編</div><h3>空洞の熱帯</h3><p>「トマトスクール」から最終話まで、全9話の連作です。</p></div>
@@ -227,6 +231,79 @@
         es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
       }, { threshold: 0.15 });
       document.querySelectorAll('.reveal, .card').forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+  <!-- 横にすべるカードの切りかえ：スマホは指ですべらせる（「← 横にすべらせて見られます →」を出す）。
+       パソコン（マウスで操作する画面）は、案内を隠して、左右の ◀ ▶ を押して動かす -->
+  <style>
+    .hscroll { position: relative; }
+    .hscroll .arrow { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .hint { display: none; }
+      .hscroll .arrow { display: flex; align-items: center; justify-content: center; position: absolute; z-index: 5; top: 50%; width: 48px; height: 48px; margin-top: -28px; border: 1px solid rgba(232,199,122,.6); border-radius: 50%; background: rgba(11,18,34,.85); color: #e8c77a; font-size: 18px; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45); transition: opacity .3s, background .3s; }
+      .hscroll .arrow:hover { background: rgba(30,44,80,.95); }
+      .hscroll .arrow.prev { left: 4px; }
+      .hscroll .arrow.next { right: 4px; }
+      .hscroll .arrow[disabled] { opacity: 0; pointer-events: none; }
+    }
+  </style>
+  <script>
+    (function () {
+      document.querySelectorAll('[data-arrows]').forEach(function (row) {
+        var wrap = document.createElement('div');
+        wrap.className = 'hscroll';
+        row.parentNode.insertBefore(wrap, row);
+        wrap.appendChild(row);
+        function make(cls, label, text, dir) {
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'arrow ' + cls; b.setAttribute('aria-label', label); b.textContent = text;
+          b.addEventListener('click', function () {
+            var first = row.firstElementChild;
+            var step = first ? first.getBoundingClientRect().width + 12 : row.clientWidth * 0.8;
+            row.scrollBy({ left: dir * step, behavior: 'smooth' });
+          });
+          wrap.appendChild(b);
+          return b;
+        }
+        var prev = make('prev', '前へ', '◀', -1), next = make('next', '次へ', '▶', 1);
+        function update() {
+          var max = row.scrollWidth - row.clientWidth - 2;
+          prev.disabled = row.scrollLeft <= 2;
+          next.disabled = row.scrollLeft >= max;
+        }
+        row.addEventListener('scroll', update, { passive: true });
+        addEventListener('resize', update);
+        update();
+      });
+    })();
+  </script>
+  <!-- 右側についてくる「トップへ」：右の細い線が、いまページのどのあたりかを金色で示す。丸いボタンを押すと、いちばん上へ戻る -->
+  <style>
+    .rail { position: fixed; z-index: 50; top: 18vh; right: 6px; width: 4px; height: 52vh; border-radius: 4px; background: rgba(255,255,255,.12); opacity: 0; transition: opacity .4s; pointer-events: none; }
+    .rail i { display: block; width: 100%; height: 0; border-radius: 4px; background: #e8c77a; }
+    .totop { position: fixed; z-index: 51; right: 14px; bottom: 18px; width: 64px; height: 64px; border: 1px solid rgba(232,199,122,.6); border-radius: 50%; background: rgba(11,18,34,.82); color: #e8c77a; font: 600 13px/1.1 "Hiragino Sans", "Yu Gothic UI", sans-serif; letter-spacing: .05em; cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transform: translateY(16px); transition: opacity .35s, transform .35s; pointer-events: none; }
+    .totop span { display: block; font-size: 20px; line-height: 1; margin-bottom: 2px; }
+    .show .rail, .show .totop { opacity: 1; }
+    .show .totop { transform: none; pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) { .rail, .totop { transition: none; } }
+  </style>
+  <div id="totopBox">
+    <div class="rail" aria-hidden="true"><i id="railFill"></i></div>
+    <button class="totop" type="button" aria-label="ページのいちばん上へ戻る"><span>▲</span>トップ</button>
+  </div>
+  <script>
+    (function () {
+      var box = document.getElementById('totopBox'), fill = document.getElementById('railFill');
+      function update() {
+        var max = document.documentElement.scrollHeight - innerHeight;
+        var y = scrollY;
+        box.classList.toggle('show', y > 300);
+        fill.style.height = (max > 0 ? Math.min(100, y / max * 100) : 0) + '%';
+      }
+      addEventListener('scroll', update, { passive: true });
+      addEventListener('resize', update);
+      box.querySelector('.totop').addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+      update();
     })();
   </script>
 </body>
