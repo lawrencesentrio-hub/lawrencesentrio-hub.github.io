@@ -24,14 +24,15 @@
     /* ---------- いちばん上：写真が左右に流れるスライド ---------- */
     .hero { position: relative; height: 56svh; min-height: 430px; max-height: 600px; overflow: hidden; touch-action: pan-y; }
     .track { display: flex; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.35,1); }
-    .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
+    .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; display: block; color: #fff; text-decoration: none; }
+    .cap b::after { content: " →"; color: var(--gold); }
     .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12) translateX(2%); transition: transform 7s ease-out; }
     .slide.on img { transform: scale(1.02) translateX(-2%); }
     .slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,24,.6) 0%, rgba(8,12,24,.2) 45%, rgba(8,12,24,.85) 100%); }
     .cap { position: absolute; left: 22px; right: 22px; bottom: 84px; z-index: 2; color: #fff; opacity: 0; transform: translateY(14px); transition: opacity .8s .5s, transform .8s .5s; }
     .slide.on .cap { opacity: 1; transform: none; }
     .cap small { display: block; font-size: .78rem; letter-spacing: .2em; color: var(--gold); }
-    .cap b { font-size: 1.15rem; font-weight: 600; }
+    .cap b { font-size: .82rem; font-weight: 600; }
 
     .title { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: 40px 22px 0; text-align: center; pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
     /* 題名は前の2倍（いちばん大きくて140px）。スマホでは、画面の幅に収まるいちばん大きな大きさ */
@@ -97,22 +98,22 @@
 <body>
   <header class="hero" id="hero">
     <div class="track" id="track">
-      <div class="slide on">
+      <a class="slide on" href="mokuji.html#kudo">
         <img src="img/tropic.jpg" alt="月の光に浮かぶ、ヤシの葉のシルエット" fetchpriority="high">
         <div class="cap"><small>NOVEL</small><b>連作短編「空洞の熱帯」</b></div>
-      </div>
-      <div class="slide">
+      </a>
+      <a class="slide" href="mokuji.html#oxford">
         <img src="img/oxford.jpg" alt="オックスフォードのラドクリフ・カメラと、まわりのカレッジ" loading="lazy">
         <div class="cap"><small>ESSAY</small><b>偏差値48からオックスフォードへ</b></div>
-      </div>
-      <div class="slide">
+      </a>
+      <a class="slide" href="mokuji.html#keaton">
         <img src="img/toronto.jpg" alt="夕暮れのトロントの街と、CNタワー" loading="lazy">
         <div class="cap"><small>ESSAY</small><b>トロント留学のこと</b></div>
-      </div>
-      <div class="slide">
+      </a>
+      <a class="slide" href="mokuji.html#challenge">
         <img src="img/desk.jpg" alt="夜の窓辺で、明かりのついた机" loading="lazy">
         <div class="cap"><small>CHALLENGE</small><b>Claude Code で30日チャレンジ</b></div>
-      </div>
+      </a>
     </div>
 
     <a class="title" href="index.html" style="pointer-events:auto;color:inherit;text-decoration:none" title="このページを読み直す">
@@ -215,13 +216,14 @@
         clearInterval(timer);
         if (!still) timer = setInterval(function () { go(i + 1); }, 5000);
       }
-      var x0 = null;
+      var x0 = null, moved = false;
+      track.addEventListener('click', function (e) { if (moved) { e.preventDefault(); moved = false; } });
       var hero = document.getElementById('hero');
-      hero.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+      hero.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; moved = false; }, { passive: true });
       hero.addEventListener('touchend', function (e) {
         if (x0 === null) return;
         var dx = e.changedTouches[0].clientX - x0;
-        if (Math.abs(dx) > 40) { go(dx < 0 ? i + 1 : i - 1); restart(); }
+        if (Math.abs(dx) > 40) { moved = true; go(dx < 0 ? i + 1 : i - 1); restart(); }
         x0 = null;
       });
       go(0); restart();
