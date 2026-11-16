@@ -7,63 +7,171 @@
   <meta name="description" content="小説とエッセイを書いているローレンスの自己紹介ページです。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&text=%E7%A9%BA%E6%B4%9E%E3%81%AE%E7%86%B1%E5%B8%AF&display=swap">
-  <link rel="stylesheet" href="style.css?v=28">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;800&display=swap">
+  <style>
+    :root {
+      --night: #0b1222; --deep: #121b33; --ink: #e9edf6; --sub: #a9b3c9; --gold: #e8c77a; --line: rgba(255,255,255,.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--night); color: var(--ink); font-family: "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif; line-height: 1.9; -webkit-font-smoothing: antialiased; }
+    a { color: var(--gold); }
+    .mincho { font-family: "Shippori Mincho B1", serif; }
+
+    /* ---------- いちばん上：写真が左右に流れるスライド ---------- */
+    .hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; touch-action: pan-y; }
+    .track { display: flex; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.35,1); }
+    .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; }
+    .slide img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12) translateX(2%); transition: transform 7s ease-out; }
+    .slide.on img { transform: scale(1.02) translateX(-2%); }
+    .slide::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,24,.6) 0%, rgba(8,12,24,.2) 45%, rgba(8,12,24,.85) 100%); }
+    .cap { position: absolute; left: 22px; right: 22px; bottom: 150px; z-index: 2; color: #fff; opacity: 0; transform: translateY(14px); transition: opacity .8s .5s, transform .8s .5s; }
+    .slide.on .cap { opacity: 1; transform: none; }
+    .cap small { display: block; font-size: .78rem; letter-spacing: .2em; color: var(--gold); }
+    .cap b { font-size: 1.15rem; font-weight: 600; }
+
+    .title { position: absolute; top: 0; left: 0; right: 0; z-index: 3; padding: 64px 22px 0; text-align: center; pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+    .title h1 { margin: 0; font-size: clamp(2.6rem, 12vw, 4.4rem); font-weight: 800; letter-spacing: .12em; }
+    .title .name { margin: 6px 0 0; font-size: 1.05rem; letter-spacing: .3em; }
+    .title .en { margin: 0; font-size: .72rem; letter-spacing: .35em; color: var(--sub); }
+    .title .lead { margin: 18px 0 0; font-size: .95rem; }
+
+    .dots { position: absolute; z-index: 4; left: 0; right: 0; bottom: 96px; display: flex; justify-content: center; gap: 10px; }
+    .dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 99px; background: rgba(255,255,255,.45); cursor: pointer; transition: width .4s, background .4s; }
+    .dots button.on { width: 28px; background: var(--gold); }
+    .scroll { position: absolute; z-index: 4; left: 50%; bottom: 26px; transform: translateX(-50%); color: var(--sub); font-size: .7rem; letter-spacing: .3em; text-decoration: none; text-align: center; }
+    .scroll::after { content: ""; display: block; width: 1px; height: 34px; margin: 6px auto 0; background: linear-gradient(var(--gold), transparent); animation: drop 2s infinite; }
+    @keyframes drop { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+    /* ---------- 本文 ---------- */
+    main { max-width: 720px; margin: 0 auto; padding: 0 0 40px; }
+    section { padding: 64px 22px 8px; }
+    h2 { margin: 0 0 22px; font-family: "Shippori Mincho B1", serif; font-size: 1.5rem; font-weight: 800; letter-spacing: .08em; }
+    h2::after { content: ""; display: block; width: 40px; height: 2px; margin-top: 12px; background: var(--gold); }
+    p { margin: 0 0 1em; color: #d8deeb; }
+    .note { font-size: .85rem; color: var(--sub); }
+
+    /* ふわっと出てくる */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s, transform .9s; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ---------- 書いているもの：横に流れるカード ---------- */
+    .cards { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 22px 18px; margin: 0 -22px; scrollbar-width: none; }
+    .cards::-webkit-scrollbar { display: none; }
+    .card { flex: 0 0 78%; max-width: 320px; scroll-snap-align: center; position: relative; height: 380px; border-radius: 18px; overflow: hidden; text-decoration: none; color: #fff; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
+    .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 1.2s ease-out; }
+    .card:hover img, .card.in img { transform: scale(1); }
+    .card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(6,10,20,.92)); }
+    .card .body { position: absolute; z-index: 1; left: 18px; right: 18px; bottom: 18px; }
+    .card .kind { font-size: .72rem; letter-spacing: .2em; color: var(--gold); }
+    .card h3 { margin: 4px 0 6px; font-family: "Shippori Mincho B1", serif; font-size: 1.35rem; line-height: 1.5; }
+    .card p { margin: 0; font-size: .82rem; color: #cfd6e6; line-height: 1.7; }
+    .hint { font-size: .75rem; color: var(--sub); text-align: right; margin: 0; }
+    .more { display: inline-block; margin-top: 10px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 99px; text-decoration: none; font-size: .9rem; }
+
+    /* ---------- 30日チャレンジ ---------- */
+    .challenge { position: relative; margin: 0 22px; padding: 26px 22px; border-radius: 18px; overflow: hidden; background: var(--deep); }
+    .challenge::before { content: ""; position: absolute; inset: 0; background: url(img/desk.jpg) center/cover; opacity: .28; }
+    .challenge > * { position: relative; }
+    .weeks { list-style: none; padding: 0; margin: 18px 0; }
+    .weeks li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: .92rem; }
+    .weeks li span { flex: 0 0 auto; color: var(--gold); font-family: "Shippori Mincho B1", serif; }
+
+    .links { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .links a { display: block; padding: 14px 18px; border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink); background: rgba(255,255,255,.03); }
+    .links a::after { content: "→"; float: right; color: var(--gold); }
+
+    footer { padding: 48px 22px 0; text-align: center; font-size: .78rem; color: var(--sub); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .track, .slide img, .cap, .reveal, .card img { transition: none !important; }
+      .scroll::after { animation: none; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="moon" aria-hidden="true"></div>
-    <a class="hero-inner hero-link" href="index.html" title="このページを読み直す">
-      <h1 class="site-title">空洞の熱帯</h1>
+  <header class="hero" id="hero">
+    <div class="track" id="track">
+      <div class="slide on">
+        <img src="img/tropic.jpg" alt="月の光に浮かぶ、ヤシの葉のシルエット" fetchpriority="high">
+        <div class="cap"><small>NOVEL</small><b>連作短編「空洞の熱帯」</b></div>
+      </div>
+      <div class="slide">
+        <img src="img/oxford.jpg" alt="オックスフォードのラドクリフ・カメラと、まわりのカレッジ" loading="lazy">
+        <div class="cap"><small>ESSAY</small><b>偏差値48からオックスフォードへ</b></div>
+      </div>
+      <div class="slide">
+        <img src="img/toronto.jpg" alt="夕暮れのトロントの街と、CNタワー" loading="lazy">
+        <div class="cap"><small>ESSAY</small><b>トロント留学のこと</b></div>
+      </div>
+      <div class="slide">
+        <img src="img/desk.jpg" alt="夜の窓辺で、明かりのついた机" loading="lazy">
+        <div class="cap"><small>CHALLENGE</small><b>Claude Code で30日チャレンジ</b></div>
+      </div>
+    </div>
+
+    <a class="title" href="index.html" style="pointer-events:auto;color:inherit;text-decoration:none" title="このページを読み直す">
+      <h1 class="mincho">空洞の熱帯</h1>
       <p class="name">ローレンス</p>
       <p class="en">Lawrence Sentrio</p>
       <p class="lead">小説と、エッセイを書いています。</p>
-      <hr class="rule">
     </a>
-    <svg class="hills" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,70 C200,30 360,95 560,62 C760,30 900,88 1100,58 C1260,36 1360,60 1440,48 L1440,120 L0,120 Z" fill="#223055" opacity="0.9"/>
-      <path d="M0,95 C180,72 380,110 620,88 C840,68 1040,108 1240,86 C1340,76 1400,84 1440,80 L1440,120 L0,120 Z" fill="#1a2440"/>
-    </svg>
+
+    <div class="dots" id="dots" aria-label="写真の切りかえ"></div>
+    <a class="scroll" href="#hello">SCROLL</a>
   </header>
 
   <main>
-
-    <section>
+    <section id="hello" class="reveal">
       <h2>はじめまして</h2>
       <p>note で、小説と、転落と回復のエッセイを書いています。</p>
       <p>いまは54歳で、AI の Claude Code を使った「30日チャレンジ」にも取り組んでいます。</p>
     </section>
 
-    <section>
+    <section class="reveal">
       <h2>書いているもの</h2>
-      <ul>
-        <li><a href="mokuji.html#kudo"><strong>空洞の熱帯</strong></a>（連作短編）<br><span class="note">「トマトスクール」から最終話まで、全9話の連作です。</span></li>
-        <li><a href="mokuji.html#friend"><strong>友人との電話</strong></a>（エッセイの連載）<br><span class="note">友人との電話を通して、自分の暮らしを書いています。</span></li>
-        <li><a href="mokuji.html#oxford"><strong>偏差値48からオックスフォードへ</strong></a>（連載）</li>
-        <li><a href="mokuji.html#keaton"><strong>トロント留学のこと</strong></a>（連載）</li>
-      </ul>
-      <ul class="links" style="margin-top: 20px;">
-        <li><a href="mokuji.html">連載の目次を見る →</a></li>
-      </ul>
+      <div class="cards">
+        <a class="card" href="mokuji.html#kudo">
+          <img src="img/tropic.jpg" alt="" loading="lazy">
+          <div class="body"><div class="kind">連作短編</div><h3>空洞の熱帯</h3><p>「トマトスクール」から最終話まで、全9話の連作です。</p></div>
+        </a>
+        <a class="card" href="mokuji.html#friend">
+          <img src="img/desk.jpg" alt="" loading="lazy">
+          <div class="body"><div class="kind">エッセイの連載</div><h3>友人との電話</h3><p>友人との電話を通して、自分の暮らしを書いています。</p></div>
+        </a>
+        <a class="card" href="mokuji.html#oxford">
+          <img src="img/oxford.jpg" alt="" loading="lazy">
+          <div class="body"><div class="kind">連載</div><h3>偏差値48から<br>オックスフォードへ</h3></div>
+        </a>
+        <a class="card" href="mokuji.html#keaton">
+          <img src="img/toronto.jpg" alt="" loading="lazy">
+          <div class="body"><div class="kind">連載</div><h3>トロント留学のこと</h3></div>
+        </a>
+      </div>
+      <p class="hint">← 横にすべらせて見られます →</p>
+      <a class="more" href="mokuji.html">連載の目次を見る →</a>
     </section>
 
-    <section>
+    <section class="reveal">
       <h2>30日チャレンジ</h2>
-      <p>Claude Code を使って、毎日一つ「AI に実際に仕事をさせる」練習をしています。本を読んで学ぶのではなく、手を動かして、毎日なにか一つ、できあがったものを残すことにしています。</p>
-      <p>最終的には、AI を学んでいる人をサポートするスマホアプリを作りたいと考えています。AI を学んでいる人も、つい三日坊主になりがちです。毎日お題が出て、それを一つずつクリアしていく。そんなアプリを目指しています。</p>
-      <ul>
-        <li>第1週　文章とファイルを扱う</li>
-        <li>第2週　データと自動化</li>
-        <li>第3週　自分のページを作って公開する<span class="note">（このページは、その15日目に作りました）</span></li>
-        <li>第4週　作ったものを、人に差し出す形にする</li>
-      </ul>
-      <ul class="links" style="margin-top: 20px;">
-        <li><a href="odai.html">今日のお題を見る →</a></li>
-      </ul>
-      <p><a href="mokuji.html#challenge">30日チャレンジの記事の一覧 →</a></p>
+      <div class="challenge">
+        <p>Claude Code を使って、毎日一つ「AI に実際に仕事をさせる」練習をしています。本を読んで学ぶのではなく、手を動かして、毎日なにか一つ、できあがったものを残すことにしています。</p>
+        <p>最終的には、AI を学んでいる人をサポートするスマホアプリを作りたいと考えています。AI を学んでいる人も、つい三日坊主になりがちです。毎日お題が出て、それを一つずつクリアしていく。そんなアプリを目指しています。</p>
+        <ul class="weeks">
+          <li><span>第1週</span>文章とファイルを扱う</li>
+          <li><span>第2週</span>データと自動化</li>
+          <li><span>第3週</span><div>自分のページを作って公開する<br><span class="note" style="color:var(--sub);font-family:inherit">（このページは、その15日目に作りました）</span></div></li>
+          <li><span>第4週</span>作ったものを、人に差し出す形にする</li>
+        </ul>
+        <ul class="links">
+          <li><a href="odai.html">今日のお題を見る</a></li>
+          <li><a href="mokuji.html#challenge">30日チャレンジの記事の一覧</a></li>
+        </ul>
+      </div>
     </section>
 
-    <section>
+    <section class="reveal">
       <h2>リンク</h2>
       <ul class="links">
         <li><a href="https://note.com/lawrence_sentrio" target="_blank" rel="noopener">note</a></li>
@@ -72,8 +180,54 @@
     </section>
 
     <footer>
-      <p>2026年11月　Claude Code と一緒に作りました</p>
+      <p>2026年11月　Claude Code と一緒に作りました<br>写真：Unsplash</p>
     </footer>
   </main>
+
+  <script>
+    // いちばん上の写真を、左右にすべらせて切りかえる（5秒ごと。指でスワイプしても切りかわる）
+    (function () {
+      var track = document.getElementById('track');
+      var slides = track.children;
+      var dots = document.getElementById('dots');
+      var n = slides.length, i = 0, timer = null;
+      var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      for (var k = 0; k < n; k++) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', (k + 1) + '枚目の写真');
+        (function (k) { b.onclick = function () { go(k); restart(); }; })(k);
+        dots.appendChild(b);
+      }
+      function go(k) {
+        i = (k + n) % n;
+        track.style.transform = 'translateX(' + (-100 * i) + '%)';
+        for (var j = 0; j < n; j++) {
+          slides[j].classList.toggle('on', j === i);
+          dots.children[j].classList.toggle('on', j === i);
+        }
+      }
+      function restart() {
+        clearInterval(timer);
+        if (!still) timer = setInterval(function () { go(i + 1); }, 5000);
+      }
+      var x0 = null;
+      var hero = document.getElementById('hero');
+      hero.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+      hero.addEventListener('touchend', function (e) {
+        if (x0 === null) return;
+        var dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) { go(dx < 0 ? i + 1 : i - 1); restart(); }
+        x0 = null;
+      });
+      go(0); restart();
+
+      // 下の文章とカードは、画面に入ったらふわっと出す
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.15 });
+      document.querySelectorAll('.reveal, .card').forEach(function (el) { io.observe(el); });
+    })();
+  </script>
 </body>
 </html>
