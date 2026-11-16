@@ -34,6 +34,8 @@
     .title h1 { margin: 0; font-family: "Shippori Mincho B1", serif; font-size: min(17.5vw, 4.27rem); line-height: 1.25; font-weight: 800; letter-spacing: .04em; white-space: nowrap; }
     .title .en { margin: 2px 0 0; font-size: .7rem; letter-spacing: .35em; color: var(--sub); }
     .title .lead { margin: 10px 0 0; font-size: .88rem; }
+    /* スマホでは、下の写真の説明とかぶるので出さない（記事のタイトルの後ろの ↗ で、押せることは分かる） */
+    @media (max-width: 640px) { .title .lead { display: none; } }
     .dots { position: absolute; z-index: 4; left: 0; right: 0; bottom: 22px; display: flex; justify-content: center; gap: 10px; }
     .dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 99px; background: rgba(255,255,255,.45); cursor: pointer; transition: width .4s, background .4s; }
     .dots button.on { width: 28px; background: var(--gold); }
