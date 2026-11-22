@@ -20,6 +20,12 @@ body { overflow-wrap: anywhere; }
 :lang(ja) .week, :lang(ja) .btn, :lang(ja) .more, :lang(ja) .links a, :lang(ja) .weeks li,
 :lang(ja) .kind, :lang(ja) .today-label, :lang(ja) .meta { word-break: auto-phrase; }
 
+/* いちばん上の題名：はみ出したときだけ、fit.js が --fit を 1 より小さくして縮める
+   （大きさの決まりは各ページと同じ。--fit が 1 のときは今までどおり） */
+.p-top .title h1 { font-size: calc(min(17.5vw, 5.84rem) * var(--fit, 1)); }
+.p-toc .title h1 { font-size: calc(min(17.5vw, 4.27rem) * var(--fit, 1)); }
+.p-odai .title h1 { font-size: calc(min(8.4vw, 3.2rem) * var(--fit, 1)); }
+
 @media (max-width: 600px) {
   .nw { display: inline-block; }
 
