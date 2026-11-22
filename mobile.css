@@ -1,0 +1,70 @@
+/* =========================================================
+   スマホで「文字サイズ大」「表示サイズ大」にしても崩れないように（2026-11-22）
+   ・各ページの中の <style> のあとに読みこんで、足りないところだけ上書きする
+   ・ページごとのちがいは、body の class（p-top / p-toc / p-odai）で分ける
+   ・パソコン（幅601px以上）の見た目は変えない。変えるのは下の @media の中だけ
+     （例外：言葉のまとまりで折り返す設定と、はみ出しそうな長い言葉を折る設定。
+       ふだんの大きさでは見た目は変わらない）
+   ========================================================= */
+
+/* 長い英語やURLが画面の外へはみ出さないように、必要なときだけ折り返す */
+body { overflow-wrap: anywhere; }
+/* 小さな部品は、折り返さない（「日本語」が縦に並んだりしないように） */
+.langsw, .totop, .dots, .scroll { overflow-wrap: normal; }
+
+/* 見出しは、言葉のまとまりごとに折り返す（「困っ／た」のような折れ方をしない）
+   .nw … HTML 側で言葉のまとまりを囲んだところ。スマホの幅のときだけ、まとまりの途中では折り返さない（下の @media の中）
+   auto-phrase … 日本語のページで、ブラウザが文節で折り返してくれる（新しい Chrome） */
+.chip .nw { position: static; }  /* 目次の小さなカードは「span を下に置く」決まりがあるので、囲みには効かせない */
+:lang(ja) h1, :lang(ja) h2, :lang(ja) h3, :lang(ja) .cap b, :lang(ja) .chip span,
+:lang(ja) .week, :lang(ja) .btn, :lang(ja) .more, :lang(ja) .links a, :lang(ja) .weeks li,
+:lang(ja) .kind, :lang(ja) .today-label, :lang(ja) .meta { word-break: auto-phrase; }
+
+@media (max-width: 600px) {
+  .nw { display: inline-block; }
+
+  /* ---------- いちばん上の写真：文字が大きくなったら、写真の部分も下へ伸びる ----------
+     題名を「重ねて置く」のをやめて、ふつうに並べる。写真は後ろに敷いたまま。
+     下の余白は、写真の説明（2行まで）と点々の分。文字の大きさに合わせて伸びる */
+  .hero { height: auto; max-height: none; }
+  .hero .track { position: absolute; inset: 0; height: auto; }
+  .hero .title { position: relative; display: block; padding-bottom: calc(56px + 5.4rem); }
+  .p-top .hero .title { padding-bottom: calc(84px + 6rem); }
+
+  /* 写真の説明は、画面の幅に入る大きさまで */
+  .p-top .cap b { font-size: min(.82rem, 8vw); }
+  .p-toc .cap b { font-size: min(1.05rem, 8vw); }
+  .p-odai .cap b { font-size: min(1rem, 9vw); }
+
+  /* ---------- トップ ---------- */
+  .p-top h2 { font-size: min(1.5rem, 10vw); }
+  .p-top .card .body { left: 14px; right: 14px; }
+  .p-top .card h3 { font-size: min(1.35rem, 6.4vw); }
+
+  /* ---------- 目次 ---------- */
+  /* 写真の帯：題名が長くなったら、帯が上へ伸びる（上で切れないように） */
+  .p-toc .banner { height: auto; min-height: 240px; display: flex; align-items: flex-end; }
+  .p-toc .btext { position: relative; left: auto; right: auto; bottom: auto; padding: 72px 16px 12px; }
+  .p-toc .btext h2 { font-size: min(1.3rem, 8vw); }
+  .p-toc .chip span { font-size: min(.74rem, 6vw); }
+
+  /* ---------- お題 ---------- */
+  /* 30日の四角が、画面の右へはみ出さないように */
+  .p-odai .days { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .p-odai .days button { padding: 0; font-size: min(.8rem, 5vw); }
+  /* 「前の日」「次の日」：入らないときは縦に並べて、ボタンを横いっぱいに */
+  .p-odai .controls { grid-template-columns: repeat(auto-fit, minmax(min(100%, 5.6em), 1fr)); }
+  .p-odai .controls #prev, .p-odai .controls #next { justify-self: stretch; }
+}
+
+@media (max-width: 300px) {
+  /* もっとせまい画面（「表示サイズ大」と「文字サイズ大」を両方いちばん大きくしたとき）の、長い題名 */
+  .p-top .card h3 { font-size: 5.8vw; }
+  .p-toc .btext h2 { font-size: 7vw; }
+}
+
+@media (max-width: 420px) {
+  /* トップの「30日チャレンジ」の箱：左右の余白を少しせまく、週の名前と中身を縦に */
+  .p-top .challenge { margin: 0; padding: 22px 16px; }
+  .p-top .weeks li { flex-direction: column; gap: 0; }
+}
